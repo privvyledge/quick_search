@@ -1,5 +1,0 @@
-change variable names
-change BeautifulSoup parser to lxml, or html5lib
-warn if query is the same especially from the clipboard
-add video, photo and multiple section results (like news, images, etc on google)
-make a command line interface
