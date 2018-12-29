@@ -1,5 +1,5 @@
 #! python3
-# quick_search - opens several google result links
+# quick_search - opens several search result links
 
 import bs4
 import pyperclip
@@ -31,13 +31,6 @@ browser = webbrowser.get()
 
 new_search = ''
 
-# change variable names
-# change BeautifulSoup parser to lxml, or html5lib
-# make a while loop to get more user input for search queries
-# warn if query is the same especially from the clipboard
-# add video, photo and multiple section results (like news, images, etc on google)
-# to do: make this program a command line interface
-
 while new_search != 'n':
     search_query = query_getter().strip()
 
@@ -55,7 +48,7 @@ while new_search != 'n':
         search_page = search_urls.get('google')
         search_page_name = 'google'
 
-    website = search_page[0] + search_query
+    url = search_page[0] + search_query
 
     print(f'Searching {search_page_name}....')
 
@@ -66,36 +59,36 @@ while new_search != 'n':
 
     try:
         # since amazon is anti-scraping, header have to be used to avoid 503 error
-        res = requests.get(website, headers=headers, timeout=5) if search_page_name == 'amazon' \
-            else requests.get(website, timeout=5)
-        res.raise_for_status()
+        response = requests.get(url, headers=headers, timeout=5) if search_page_name == 'amazon' \
+            else requests.get(url, timeout=5)
+        response.raise_for_status()
 
     except Exception as derr:
-        print('There was a problem opening the website: {}'.format(derr))
+        print(f'There was a problem opening the website: {derr}')
         print(derr)
 
     else:
 
         # to get all the html data from that page
-        soup = bs4.BeautifulSoup(res.text, features="html.parser")
+        soup = bs4.BeautifulSoup(response.text, features="html.parser")
 
         # to load the result links
-        linkElems = soup.select(search_page[2])  # css class named r with element a
+        link_elements = soup.select(search_page[2])  # css class named r with element a
 
-        print('There are about {} results on this page. How many should be opened? (default is 5)'.format(len(linkElems)))
-        num_of_links = input('Enter number of links to open: ')
+        print(f'There are about {len(link_elements)} results on this page. How many should be opened? (default is 5)')
+        number_of_links = input('Enter number of links to open: ')
 
         # to open a browser tab for each result
-        if num_of_links == '':
-            numOpen = min(5, len(linkElems))
+        if number_of_links == '':
+            links_to_open = min(5, len(link_elements))
 
         else:
-            numOpen = int(num_of_links)
+            links_to_open = int(number_of_links)
 
-        browser.open_new(website)
+        browser.open_new(url)
 
-        for i in range(numOpen):
-            browser.open(search_page[1] + linkElems[i].get('href'))
+        for i in range(links_to_open):
+            browser.open(search_page[1] + link_elements[i].get('href'))
 
     print('Done')
     
